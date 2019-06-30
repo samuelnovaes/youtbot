@@ -14,6 +14,9 @@ const bot = new BootBot({
 
 const play = (chat, videoId) => {
 	const stream = ytdl(`https://www.youtube.com/watch?v=${videoId}`).pipe(fs.createWriteStream(`static/${process.env.FB_VERIFY_TOKEN}.mp4`))
+	stream.on('error', () => {
+		chat.say('Error')
+	})
 	stream.on('close', () => {
 		chat.say({
 			attachment: 'video',
