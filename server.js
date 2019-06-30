@@ -59,7 +59,7 @@ fs.ensureDir('static').then(() => {
 	else {
 		bot._initWebhook()
 		bot.app.listen(80, listenMsg.bind(null, 80))
-		https.createServer({
+		bot.server = https.createServer({
 			key: fs.readFileSync(process.env.HTTPS_KEY),
 			cert: fs.readFileSync(process.env.HTTPS_CERT),
 			ca: fs.readFileSync(process.env.HTTPS_CA)
