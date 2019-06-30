@@ -29,6 +29,18 @@ const listenMsg = (port) => {
 
 bot.app.use(express.static('static'))
 
+
+if (process.env.NODE_ENV != 'development') {
+	bot.app.use((req, res, next) => {
+		if(req.secure){
+			next()
+		}
+		else {
+			res.redirect(`https://${req.hostname}/${req.originalUrl}`)
+		}
+	})
+}
+
 bot.hear([/^play\s+.*$/i], (payload, chat) => {
 	const url = payload.message.text.replace(/^play\s+(.*)$/, '$1')
 	play(chat, url)
