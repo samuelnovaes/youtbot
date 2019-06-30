@@ -12,13 +12,12 @@ const bot = new BootBot({
 	appSecret: process.env.FB_APP_SECRET
 })
 
-const play = (chat, url) => {
-	console.log(`play ${url}`)
-	const stream = ytdl(url).pipe(fs.createWriteStream('static/video.mp4'))
+const play = (chat, videoId) => {
+	const stream = ytdl(`https://www.youtube.com/watch?v=${videoId}`).pipe(fs.createWriteStream('static/video.mp4'))
 	stream.on('close', () => {
 		chat.say({
 			attachment: 'video',
-			url: 'https://52.35.251.213/video.mp4'
+			url: process.env.VIDEO_URL
 		})
 	})
 }
@@ -43,12 +42,11 @@ if (process.env.NODE_ENV != 'development') {
 }
 
 bot.hear([/^play\s+.*$/i], (payload, chat) => {
-	const url = payload.message.text.replace(/^play\s+(.*)$/, '$1')
-	play(chat, url)
+	const videoId = payload.message.text.replace(/^play\s+(.*)$/, '$1')
+	play(chat, videoId)
 })
 
 bot.hear([/^search\s+.*$/i], (payload, chat) => {
-	console.log(payload.message.text)
 	const query = payload.message.text.replace(/^search\s+(.*)$/, '$1')
 	ytSearch(query, (err, r) => {
 		for (const video of r.videos) {
