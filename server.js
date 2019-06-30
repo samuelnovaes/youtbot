@@ -25,11 +25,12 @@ const play = (chat, videoId) => {
 		url = videoId
 	}
 	else {
-		return chat.say('Error')
+		return chat.say('Invalid url or video ID')
 	}
+	chat.say('Downloading video...')
 	const stream = ytdl(url).pipe(fs.createWriteStream(`static/${process.env.FB_VERIFY_TOKEN}.mp4`))
-	stream.on('error', () => {
-		chat.say('Error')
+	stream.on('error', err => {
+		chat.say(err.message)
 	})
 	stream.on('close', () => {
 		chat.say({
@@ -69,7 +70,7 @@ bot.hear([regSearch], (payload, chat) => {
 		pageStart
 	}, (err, r) => {
 		if (err) {
-			chat.say('Error')
+			chat.say(err.message)
 		}
 		else {
 			for (const video of r.videos) {
