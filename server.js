@@ -13,6 +13,7 @@ const bot = new BootBot({
 })
 
 const play = (chat, url) => {
+	console.log(`play ${url}`)
 	const stream = ytdl(url).pipe(fs.createWriteStream('static/video.mp4'))
 	stream.on('close', () => {
 		chat.say({
@@ -47,6 +48,7 @@ bot.hear([/^play\s+.*$/i], (payload, chat) => {
 })
 
 bot.hear([/^search\s+.*$/i], (payload, chat) => {
+	console.log(payload.message.text)
 	const query = payload.message.text.replace(/^search\s+(.*)$/, '$1')
 	ytSearch(query, (err, r) => {
 		for (const video of r.videos) {
