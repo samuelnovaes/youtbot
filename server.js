@@ -36,7 +36,7 @@ if (process.env.NODE_ENV != 'development') {
 			next()
 		}
 		else {
-			res.redirect(`https://${req.hostname}/${req.originalUrl}`)
+			res.redirect(`https://${req.headers.host}/${req.url}`)
 		}
 	})
 }
