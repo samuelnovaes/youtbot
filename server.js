@@ -6,6 +6,9 @@ const ytSearch = require('yt-search')
 const https = require('https')
 require('dotenv').config()
 
+const regPlay = /^play (.+)$/i
+const regSearch = /^search (.+) (\d+)$/i
+
 const bot = new BootBot({
 	accessToken: process.env.FB_ACCESS_TOKEN,
 	verifyToken: process.env.FB_VERIFY_TOKEN,
@@ -43,21 +46,29 @@ if (process.env.NODE_ENV != 'development') {
 
 bot.app.use(express.static('static'))
 
-bot.hear([/^play\s+.*$/i], (payload, chat) => {
-	const videoId = payload.message.text.replace(/^play\s+(.*)$/, '$1')
-	play(chat, videoId)
+bot.hear([regPlay], (payload, chat) => {
+	const videoId = payload.message.text.replace(regPlay, '$1')
+	play(chat, videoId.trim())
 })
 
-bot.hear([/^search\s+.*$/i], (payload, chat) => {
-	const query = payload.message.text.replace(/^search\s+(.*)$/, '$1')
-	ytSearch(query, (err, r) => {
-		for (const video of r.videos) {
-			chat.say({
-				text: `${video.author.name}\n${video.title}\n${video.duration.timestamp}`,
-				buttons: [
-					{ type: 'postback', title: 'play', payload: video.videoId }
-				]
-			})
+bot.hear([regSearch], (payload, chat) => {
+	const [, query, pageStart] = payload.message.text.trim().match(regSearch)
+	ytSearch({
+		query,
+		pageStart
+	}, (err, r) => {
+		if (err) {
+			chat.say('Error')
+		}
+		else {
+			for (const video of r.videos) {
+				chat.say({
+					text: `${video.author.name}\n${video.title}\n${video.duration.timestamp}`,
+					buttons: [
+						{ type: 'postback', title: 'play', payload: video.videoId }
+					]
+				})
+			}
 		}
 	})
 })
