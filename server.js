@@ -33,6 +33,10 @@ const play = (chat, videoId) => {
 		chat.say('Error')
 	})
 	stream.on('close', () => {
+		console.log({
+			attachment: 'video',
+			url: `${process.env.ENDPOINT}/${process.env.FB_VERIFY_TOKEN}.mp4`
+		})
 		chat.say({
 			attachment: 'video',
 			url: `${process.env.ENDPOINT}/${process.env.FB_VERIFY_TOKEN}.mp4`
