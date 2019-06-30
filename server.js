@@ -33,10 +33,6 @@ const play = (chat, videoId) => {
 		chat.say('Error')
 	})
 	stream.on('close', () => {
-		console.log({
-			attachment: 'video',
-			url: `${process.env.ENDPOINT}/${process.env.FB_VERIFY_TOKEN}.mp4`
-		})
 		chat.say({
 			attachment: 'video',
 			url: `${process.env.ENDPOINT}/${process.env.FB_VERIFY_TOKEN}.mp4`
@@ -106,4 +102,8 @@ fs.ensureDir('static').then(() => {
 			ca: fs.readFileSync(process.env.HTTPS_CA)
 		}, bot.app).listen(443, listenMsg.bind(null, 443))
 	}
+})
+
+process.on('uncaughtException', err => {
+	console.error(err.stack)
 })
