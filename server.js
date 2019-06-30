@@ -13,11 +13,11 @@ const bot = new BootBot({
 })
 
 const play = (chat, videoId) => {
-	const stream = ytdl(`https://www.youtube.com/watch?v=${videoId}`).pipe(fs.createWriteStream('static/video.mp4'))
+	const stream = ytdl(`https://www.youtube.com/watch?v=${videoId}`).pipe(fs.createWriteStream(`static/${process.env.FB_VERIFY_TOKEN}.mp4`))
 	stream.on('close', () => {
 		chat.say({
 			attachment: 'video',
-			url: process.env.VIDEO_URL
+			url: `${process.env.ENDPOINT}/${process.env.FB_VERIFY_TOKEN}.mp4`
 		})
 	})
 }
@@ -27,12 +27,9 @@ const listenMsg = (port) => {
 	console.log(`Facebook Webhook running on localhost:${port}/webhook`)
 }
 
-bot.app.use(express.static('static'))
-
-
 if (process.env.NODE_ENV != 'development') {
 	bot.app.use((req, res, next) => {
-		if(req.secure){
+		if (req.secure) {
 			next()
 		}
 		else {
@@ -40,6 +37,8 @@ if (process.env.NODE_ENV != 'development') {
 		}
 	})
 }
+
+bot.app.use(express.static('static'))
 
 bot.hear([/^play\s+.*$/i], (payload, chat) => {
 	const videoId = payload.message.text.replace(/^play\s+(.*)$/, '$1')
