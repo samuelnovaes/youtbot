@@ -3,6 +3,7 @@ const fs = require('fs-extra')
 const ytdl = require('ytdl-core')
 const express = require('express')
 const ytSearch = require('yt-search')
+const https = require('https')
 require('dotenv').config()
 
 const bot = new BootBot({
@@ -19,6 +20,11 @@ const play = (chat, url) => {
 			url: 'https://52.35.251.213/video.mp4'
 		})
 	})
+}
+
+const listenMsg = (port) => {
+	console.log(`BootBot running on port ${port}`)
+	console.log(`Facebook Webhook running on localhost:${port}/webhook`)
 }
 
 bot.app.use(express.static('static'))
@@ -47,5 +53,16 @@ bot.on('postback', (payload, chat) => {
 })
 
 fs.ensureDir('static').then(() => {
-	bot.start(process.env.PORT)
+	if (process.env.NODE_ENV == 'development') {
+		bot.start(3000)
+	}
+	else {
+		bot._initWebhook()
+		bot.app.listen(80, listenMsg.bind(null, 80))
+		https.createServer({
+			key: fs.readFileSync(process.env.HTTPS_KEY),
+			cert: fs.readFileSync(process.env.HTTPS_CERT),
+			ca: fs.readFileSync(process.env.HTTPS_CA)
+		}, bot.app).listen(443, listenMsg.bind(null, 443))
+	}
 })
